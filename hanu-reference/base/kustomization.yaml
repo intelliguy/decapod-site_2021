@@ -1,5 +1,5 @@
 resources:
-  - ../base
+  - resources.yaml
 
 transformers:
   - site-values.yaml

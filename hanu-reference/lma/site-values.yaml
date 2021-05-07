@@ -6,8 +6,8 @@ metadata:
 global:
   nodeSelector:
     taco-lma: enabled
-  clusterName: cluster.local
-  storageClassName: taco-storage
+  clusterName: siim-dev
+  storageClassName: rbd
   repository: https://openinfradev.github.io/hanu-helm-repo/
   serviceScrapeInterval: 30s
   defaultPassword: password
@@ -25,13 +25,15 @@ charts:
 - name: prometheus
   override:
     kubeEtcd.endpoints:
-    - 172.27.1.222
+    - 192.168.105.161
+    - 192.168.105.162
+    - 192.168.105.163
     prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName: $(storageClassName)
     prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage: 10Gi
     prometheus.prometheusSpec.retention: 2d
     prometheus.prometheusSpec.externalLabels.taco_cluster: dev
     prometheus.prometheusSpec.nodeSelector: $(nodeSelector)
-    
+
 - name: prometheus-fed-master
   override:
     alertmanager.service.type: NodePort
@@ -39,10 +41,10 @@ charts:
     alertmanager.alertmanagerSpec.alertmanagerConfigSelector.matchLabels.alertmanagerConfig: example
     alertmanager.alertmanagerSpec.nodeSelector: $(nodeSelector)
     alertmanager.alertmanagerSpec.retention: 2h
-    alertmanager.config.global.slack_api_url: https://hooks.slack.com/services/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
+    alertmanager.config.global.slack_api_url: https://hooks.slack.com/services/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
     prometheus.prometheusSpec.nodeSelector: $(nodeSelector)
     prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName: $(storageClassName)
-    prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage: 20Gi
+    prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage: 200Gi
 
 - name: prometheus-node-exporter  
 
@@ -63,23 +65,28 @@ charts:
     kibana.nodeSelector: $(nodeSelector)
     
     elasticsearch.nodeSets.master.nodeSelector: $(nodeSelector)
-    elasticsearch.nodeSets.master.count: 1
-    elasticsearch.nodeSets.master.javaOpts: "-Xms1g -Xmx1g"
+    elasticsearch.nodeSets.master.count: 3
+    elasticsearch.nodeSets.master.javaOpts: "-Xms2g -Xmx2g"
     elasticsearch.nodeSets.master.limitCpu: 2
     elasticsearch.nodeSets.master.limitMem: 4Gi
     elasticsearch.nodeSets.master.pvc.storageClassName: $(storageClassName)
     elasticsearch.nodeSets.master.pvc.size: 1Gi
 
     elasticsearch.nodeSets.hotdata.nodeSelector: $(nodeSelector)
-    elasticsearch.nodeSets.hotdata.count: 1
-    elasticsearch.nodeSets.hotdata.javaOpts: "-Xms1g -Xmx1g"
+    elasticsearch.nodeSets.hotdata.count: 3
+    elasticsearch.nodeSets.hotdata.javaOpts: "-Xms10g -Xmx10g"
     elasticsearch.nodeSets.hotdata.limitCpu: 2
-    elasticsearch.nodeSets.hotdata.limitMem: 2Gi
+    elasticsearch.nodeSets.hotdata.limitMem: 20Gi
     elasticsearch.nodeSets.hotdata.pvc.storageClassName: $(storageClassName)
     elasticsearch.nodeSets.hotdata.pvc.size: 10Gi
 
-    elasticsearch.nodeSets.client.enabled: false
-
+    elasticsearch.nodeSets.client.enabled: true
+    elasticsearch.nodeSets.client.count: 1
+    elasticsearch.nodeSets.client.javaOpts: "-Xms10g -Xmx10g"
+    elasticsearch.nodeSets.client.limitCpu: 2
+    elasticsearch.nodeSets.client.limitMem: 20Gi
+    elasticsearch.nodeSets.client.pvc.storageClassName: $(storageClassName)
+    elasticsearch.nodeSets.client.pvc.size: 10Gi
 
 - name: grafana
   override:
@@ -158,11 +165,23 @@ charts:
     clusterDomain: $(clusterName)
     existingObjstoreSecret: $(thanosObjstoreSecret)
     query.nodeSelector: $(nodeSelector)
+    # query.stores:
+    # - thanos-storegateway:9090
+    # - thanos-sidecars.lma:30901
+    # query.stores:
+    # - prometheus-operated.lma.svc.$(clusterName):10901
+    query.service:
+        type: NodePort
+        http:
+          port: 9090
+          nodePort: 30007
+        grpc:
+          port: 10901
+          nodePort: 30006
+
     queryFrontend.nodeSelector: $(nodeSelector)
     queryFrontend.service.type: NodePort
     queryFrontend.service.http.nodePort: 30007
-    querier.stores:
-    - prometheus-operated.lma.svc.$(clusterName):10901
     bucketweb.enabled: $(thanosPrimaryCluster)
     bucketweb.nodeSelector: $(nodeSelector)
     compactor.enabled: $(thanosPrimaryCluster)
@@ -195,4 +214,4 @@ charts:
       secretName: $(thanosObjstoreSecret)
     sidecarsService.name: thanos-sidecars
     sidecarsService.endpoints:
-      - 192.168.97.102 # should not be in the loopback range (127.0.0.0/8)
+      - 192.168.5.101
