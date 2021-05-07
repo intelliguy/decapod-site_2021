@@ -4,16 +4,21 @@ metadata:
   name: site
 
 global:
+<<<<<<< HEAD
   clusterName: cluster.local
   storageClassName: taco-storage
+=======
+  clusterName: siim-dev
+  storageClassName: rbd
+>>>>>>> fit to siim-dev
   repository: https://openinfradev.github.io/hanu-helm-repo/
-  externalIP: 172.16.53.26
-  ceph_keyring: AQBAHAdfHQ5RLhAAzynxAYUokA55ku4ZwqVJjQ==
-  cinder_keyring: AQAin8tU0CFgEhAATb7sYgtWsh+S5HEbg6MrGg==
+  externalIP: 192.168.5.61
+  ceph_keyring: AQAu8RBcjFQjChAA7qtuzWau1f7nc4e0zEVFHw==
+  cinder_keyring: AQBiXBVcES03FBAAmFNSwwwjYtp2WfPV8P9nfw==
   rbd_secret_uuid: 582393ff-9a5c-4a2e-ae0d-86ec18c36afc
-  hypervisorInterface: eth0
-  libvirtInterface: eth0
-  adminPassword: Pa$$w0rd!
+  hypervisorInterface: eno1
+  libvirtInterface: ens1f1
+  adminPassword: password
 
 charts:
 - name: ceph-provisioners
@@ -26,7 +31,7 @@ charts:
     deployment.cephfs_provisioner: false
     storageclass.rbd.provision_storage_class: true
     storageclass.cephfs.provision_storage_class: false
-    conf.ceph.global.mon_host: TACO_MON_HOST
+    conf.ceph.global.mon_host: 192.168.5.72
     manifests.configmap_bin: false
     manifests.configmap_bin_common: false
     manifests.configmap_etc: true
@@ -170,7 +175,7 @@ charts:
     conf.horizon.local_settings.config.openstack_neutron_network.enable_firewall: "False"
     conf.horizon.local_settings.config.openstack_neutron_network.enable_vpn: "False"
     conf.horizon.local_settings.config.openstack_neutron_network.enable_fip_topology_check: "True"
-      
+
 - name: ingress
   source:
     repository: $(repository)
@@ -257,6 +262,7 @@ charts:
     monitoring.prometheus.enabled: true
     monitoring.prometheus.memcached_exporter.scrape: true
     endpoints.cluster_domain_suffix: $(clusterName)
+
 - name: neutron
   source:
     repository: $(repository)

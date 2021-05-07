@@ -3,7 +3,7 @@ kind: HelmValuesTransformer
 metadata:
   name: image
 global:
-  registry: deploy001:5000
+  registry: registry.cicd.stg.taco
 
 charts:
 - name: glance
