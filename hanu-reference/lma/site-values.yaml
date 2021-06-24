@@ -6,7 +6,7 @@ metadata:
 global:
   nodeSelector:
     taco-lma: enabled
-  clusterName: siim-dev
+  clusterName: siim-aws
   storageClassName: rbd
   repository: https://openinfradev.github.io/hanu-helm-repo/
   serviceScrapeInterval: 30s
@@ -25,9 +25,9 @@ charts:
 - name: prometheus
   override:
     kubeEtcd.endpoints:
-    - 192.168.105.161
-    - 192.168.105.162
-    - 192.168.105.163
+    - 10.0.0.125
+    - 10.0.0.171
+    - 10.0.0.200
     prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName: $(storageClassName)
     prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage: 10Gi
     prometheus.prometheusSpec.retention: 2d
@@ -214,4 +214,6 @@ charts:
       secretName: $(thanosObjstoreSecret)
     sidecarsService.name: thanos-sidecars
     sidecarsService.endpoints:
-      - 192.168.5.101
+      - 10.0.0.125
+      - 10.0.0.171
+      - 10.0.0.200

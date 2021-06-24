@@ -4,13 +4,8 @@ metadata:
   name: site
 
 global:
-<<<<<<< HEAD
-  clusterName: cluster.local
-  storageClassName: taco-storage
-=======
   clusterName: siim-dev
   storageClassName: rbd
->>>>>>> fit to siim-dev
   repository: https://openinfradev.github.io/hanu-helm-repo/
   externalIP: 192.168.5.61
   ceph_keyring: AQAu8RBcjFQjChAA7qtuzWau1f7nc4e0zEVFHw==
