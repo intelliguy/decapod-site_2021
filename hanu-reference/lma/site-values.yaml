@@ -135,8 +135,9 @@ charts:
   override:
     SPECIAL_VALUE: SPECIAL
 
-    grafanaDashboard.argocd.enabled: false
-    grafanaDashboard.argowf.enabled: false
+    grafanaDashboard.sidecar.datasources.prometheusAddress: "thanos-query:9090"
+    grafanaDashboard.argocd.enabled: true
+    grafanaDashboard.argowf.enabled: true
     serviceMonitor.trident:
       enabled: false
       interval: $(serviceScrapeInterval)

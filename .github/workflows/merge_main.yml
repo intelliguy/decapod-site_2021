@@ -33,4 +33,4 @@ jobs:
           destination-repository-name: 'decapod-site-cd'
           user-email: 'taco_support@sk.com'
           commit-message: See ORIGIN_COMMIT
-          target-branch: siim-dev
+          target-branch: main
